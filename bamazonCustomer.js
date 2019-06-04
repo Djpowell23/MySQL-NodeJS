@@ -69,7 +69,39 @@ function purchase() {
                     customerItem = res[i];
                 };
             };
-            // console.log(customerItem);
+
+            // Most code goes here
+            // Logic to determine if there are enough items in stock
+            if (customerItem.stock_quantity >= parseInt(answer.howMany)) {
+                // Determine new quantity of items in stock
+                var newQuantity = customerItem.stock_quantity -= parseInt(answer.howMany);
+            
+                // Calculate Order Total
+                var orderTotal = customerItem.price * parseInt(answer.howMany);
+
+                // Update Databases with new inventory
+                connection.query('UPDATE products SET ? WHERE ?', [{stock_quantity: newQuantity}, {item_id: customerItem}], function (err) {
+                    if (err) throw err;
+
+                    console.log('--------------------------');
+                    console.log('Order successfully placed!');
+                    console.log(`Order: $${orderTotal.toFixed(2)}`);
+                });
+
+
+
+
+
+
+
+            }
+            
+
+
+
+
+
+
         });
     });
 }           
