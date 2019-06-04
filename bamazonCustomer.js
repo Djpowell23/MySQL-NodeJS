@@ -7,6 +7,7 @@ var customerItem = '';
 var customerQuantity = 0;
 
 // Create Object for product table
+// Might not need this code
 var productList = {
     id: 'item_id',
     name: 'product_name',
@@ -39,19 +40,24 @@ function shop() {
             name: 'userType',
             message: 'What would you like to do today?',
             type: 'list',
-            choices: ['Go Shopping','Manage Inventory']
+            choices: ['Go Shopping','Leave Shop']
         }
     ]).then(function(shopping) {
         if (shopping.userType === 'Go Shopping') {
+            // // Display all products to the console
+            // connection.query('SELECT * FROM products', function(err, res) {
+            //     if (err) throw err;
+
+            //     // for (var i = 0; i < res.length; i++) {
+            //     //     if (res[i].stock_quantity > 0) {
+            //     //         console.log(`${res[i].item_id, res[i].product_name}`);       // This code may be able to delete
+            //     //     }
+            //     // }
+            // });
             purchase();
-            // Display all products to the console
-            connection.query('SELECT * FROM products', function(err, res) {
-                for (var i = 0; i < res.length; i++) {
-                    if (res[i].stock_quantity > 0) {
-                        console.log(res[i].item_id, res[i].product_name);
-                    }
-                }
-            });
+        } else {
+            console.log('Have a nice day!');
+            connection.end();
         }
     });
 }
