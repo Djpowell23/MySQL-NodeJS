@@ -2,6 +2,10 @@
 var mysql = require('mysql');
 var inquirer = require('inquirer');
 
+// Variables
+var customerItem = '';
+var customerQuantity = 0;
+
 // Create Object for product table
 var productList = {
     id: 'item_id',
@@ -24,60 +28,48 @@ var connection = mysql.createConnection({
 connection.connect(function (err) {
     if (err) throw err;
     console.log('Connected to mysql database');
-    displayTable();
+    
+    purchase();
 });
 
-// Functions
 
-// Display All Items that are for sale
-function displayTable() {
 
-    connection.query('SELECT * FROM products', function (err, res) {
+
+function purchase() {
+    connection.query('SELECT * FROM products', function(err, res) {
         if (err) throw err;
 
-        // // Naming each item
-        // for (var k = 0; k < item.length; k++) {
-        //     console.log(item[i]);
-        // }
-
-        // Define variables
-        var tvData = res[0];
-        var vacuumData = res[1];
-        var chairData = res[2];
-        var legoData = res[3];
-        var blouseData = res[4];
-        var trampData = res[5];
-        var razorData = res[6];
-        var bedData = res[7];
-        var oilData = res[8];
-        var printerData = res[9];
-
-        // Push item list into array
-        var forSale = [];
-
-        // Take In-Stock Items and push them to the forSale array
-        for (var j = 0; j < res.length; j++) {
-            if (res[j].stock_quantity > 0) {
-                forSale.push(res[j]);
+        // Inquirer
+        inquirer.prompt([
+            {
+                message: 'What item would you like to purchase?',
+                name: 'whatItem',
+                type: 'list',
+                choices: function() {
+                    var forSale = [];
+                    for (var i = 0; i < res.length; i++) {
+                        if (res[i].stock_quantity > 0) {
+                            forSale.push(res[i].product_name);
+                        };
+                    };
+                    return forSale;
+                },
+            },
+            {
+                message: 'How many units would you like to buy?',
+                name: 'howMany',
+                type: 'input'
             }
-        }
-
-        // Display every item that is still in stock
-        for (var i = 0; i < res.length; i++) {
-            console.log(res[i].item_id, res[i].product_name, res[i].department_name, res[i].price, res[i].stock_quantity);
-        }
+        ]).then(function(answer) {
+            // Save product as a variable
+            var customerItem;
+            console.log('inquirer prompt finished correctly');
+            for (var i = 0; i < res.length; i++) {
+                if (res[i].product_name === answer.whatItem) {
+                    customerItem = res[i];
+                };
+            };
+            // console.log(customerItem);
+        });
     });
-}
-
-// function inquirerPrompt() {
-//     // Inquirer
-//     inquirer.prompt(
-//         {
-//             name: 'whatItem',
-//             type: 'list',
-//             message: 'What Item would you like to buy?'
-//         }
-//     ).then(response, function (err) {
-//         if (err) throw err;
-//     });
-// }
+}           
