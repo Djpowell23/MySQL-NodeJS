@@ -121,6 +121,7 @@ function purchase() {
                 console.log('--------------------------');
                 console.log(`Sorry, we don't have enough of that to fill your order.`);
                 console.log('--------------------------');
+                shop();
             }
         });
     });
