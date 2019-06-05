@@ -36,15 +36,7 @@ function shop() {
             // // Display all products to the console
             connection.query('SELECT * FROM products', function(err, res) {
                 if (err) throw err;
-
                 console.table(res, ['item_id','product_name','department_name','price','stock_quantity']);
-
-                // for (var i = 0; i < res.length; i++) {
-                //     if (res[i].stock_quantity > 0) {
-                //         // console.log(`${res[i].item_id} | ${res[i].product_name} | ${res[i].department_name} | ${res[i].price} | ${res[i].stock_quantity}`);       // Add all columns
-                //         console.log(res[i].item_id + '. ' + res[i].product_name, res[i].department_name, '$' + res[i].price, res[i].stock_quantity);
-                //     }
-                // }
             });
             purchase();
         } else {
@@ -62,7 +54,7 @@ function purchase() {
         // Inquirer
         inquirer.prompt([
             {
-                message: 'Enter Item ID of item you would like to purchase:',
+                message: 'Enter ITEM_ID of item you would like to purchase:',
                 name: 'whatItem',
                 type: 'input'
             },
@@ -74,8 +66,6 @@ function purchase() {
         ]).then(function (answer) {
             // Save product as a variable
             var customerItem;
-            // console.log(res);
-            // console.log(parseInt(answer.whatItem));
             for (var i = 0; i < res.length; i++) {
                 if (res[i].item_id === parseInt(answer.whatItem)) {
                     customerItem = res[i];
