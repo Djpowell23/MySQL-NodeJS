@@ -6,16 +6,6 @@ var inquirer = require('inquirer');
 var customerItem = '';
 var customerQuantity = 0;
 
-// Create Object for product table
-// Might not need this code
-// var productList = {
-//     id: 'item_id',
-//     name: 'product_name',
-//     department: 'department_name',
-//     price: 'price',
-//     stock: 'stock_quantity'
-// };
-
 // Connect to mysql
 var connection = mysql.createConnection({
     host: 'localhost',
@@ -30,7 +20,6 @@ connection.connect(function (err) {
     if (err) throw err;
     console.log('Connected to mysql database');
     shop();
-    // purchase();
 });
 
 
@@ -48,12 +37,14 @@ function shop() {
             connection.query('SELECT * FROM products', function(err, res) {
                 if (err) throw err;
 
-                for (var i = 0; i < res.length; i++) {
-                    if (res[i].stock_quantity > 0) {
-                        // console.log(`${res[i].item_id} | ${res[i].product_name} | ${res[i].department_name} | ${res[i].price} | ${res[i].stock_quantity}`);       // Add all columns
-                        console.log(res[i].item_id + '. ' + res[i].product_name, res[i].department_name, '$' + res[i].price, res[i].stock_quantity);
-                    }
-                }
+                console.table(res, ['item_id','product_name','department_name','price','stock_quantity']);
+
+                // for (var i = 0; i < res.length; i++) {
+                //     if (res[i].stock_quantity > 0) {
+                //         // console.log(`${res[i].item_id} | ${res[i].product_name} | ${res[i].department_name} | ${res[i].price} | ${res[i].stock_quantity}`);       // Add all columns
+                //         console.log(res[i].item_id + '. ' + res[i].product_name, res[i].department_name, '$' + res[i].price, res[i].stock_quantity);
+                //     }
+                // }
             });
             purchase();
         } else {
