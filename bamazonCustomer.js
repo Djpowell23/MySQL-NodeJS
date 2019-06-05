@@ -8,13 +8,13 @@ var customerQuantity = 0;
 
 // Create Object for product table
 // Might not need this code
-var productList = {
-    id: 'item_id',
-    name: 'product_name',
-    department: 'department_name',
-    price: 'price',
-    stock: 'stock_quantity'
-};
+// var productList = {
+//     id: 'item_id',
+//     name: 'product_name',
+//     department: 'department_name',
+//     price: 'price',
+//     stock: 'stock_quantity'
+// };
 
 // Connect to mysql
 var connection = mysql.createConnection({
@@ -45,15 +45,16 @@ function shop() {
     ]).then(function(shopping) {
         if (shopping.userType === 'Go Shopping') {
             // // Display all products to the console
-            // connection.query('SELECT * FROM products', function(err, res) {
-            //     if (err) throw err;
+            connection.query('SELECT * FROM products', function(err, res) {
+                if (err) throw err;
 
-            //     // for (var i = 0; i < res.length; i++) {
-            //     //     if (res[i].stock_quantity > 0) {
-            //     //         console.log(`${res[i].item_id, res[i].product_name}`);       // This code may be able to delete
-            //     //     }
-            //     // }
-            // });
+                for (var i = 0; i < res.length; i++) {
+                    if (res[i].stock_quantity > 0) {
+                        // console.log(`${res[i].item_id} | ${res[i].product_name} | ${res[i].department_name} | ${res[i].price} | ${res[i].stock_quantity}`);       // Add all columns
+                        console.log(res[i].item_id + '. ' + res[i].product_name, res[i].department_name, '$' + res[i].price, res[i].stock_quantity);
+                    }
+                }
+            });
             purchase();
         } else {
             console.log('Have a nice day!');
@@ -70,18 +71,9 @@ function purchase() {
         // Inquirer
         inquirer.prompt([
             {
-                message: 'What item would you like to purchase?',
+                message: 'Enter Item ID of item you would like to purchase:',
                 name: 'whatItem',
-                type: 'list',
-                choices: function () {
-                    var forSale = [];
-                    for (var i = 0; i < res.length; i++) {
-                        if (res[i].stock_quantity > 0) {
-                            forSale.push(res[i].product_name);
-                        };
-                    };
-                    return forSale;
-                },
+                type: 'input'
             },
             {
                 message: 'How many units would you like to buy?',
@@ -91,8 +83,10 @@ function purchase() {
         ]).then(function (answer) {
             // Save product as a variable
             var customerItem;
+            // console.log(res);
+            // console.log(parseInt(answer.whatItem));
             for (var i = 0; i < res.length; i++) {
-                if (res[i].product_name === answer.whatItem) {
+                if (res[i].item_id === parseInt(answer.whatItem)) {
                     customerItem = res[i];
                 };
             };
@@ -107,7 +101,7 @@ function purchase() {
                 var orderTotal = customerItem.price * parseInt(answer.howMany);
 
                 // Update Databases with new inventory
-                connection.query('UPDATE products SET ? WHERE ?', [{ stock_quantity: newQuantity }, { item_id: customerItem }], function (err) {
+                connection.query('UPDATE products SET ? WHERE ?', [{ stock_quantity: newQuantity }, { item_id: customerItem.item_id }], function (err) {
                     if (err) throw err;
 
                     // Order Success/Display Total
