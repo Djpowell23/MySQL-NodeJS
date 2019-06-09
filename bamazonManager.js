@@ -1,18 +1,3 @@
-// List a set of menu options:
-// View Products for Sale               // done
-
-// View Low Inventory                   // done
-
-// Add to Inventory                    
-
-// Add New Product
-
-// If a manager selects View Products for Sale, the app should list every available item: the item IDs, names, prices, and quantities.
-// If a manager selects View Low Inventory, then it should list all items with an inventory count lower than five.
-// If a manager selects Add to Inventory, your app should display a prompt that will let the manager "add more" of any item currently 
-//     in the store.
-// If a manager selects Add New Product, it should allow the manager to add a completely new product to the store.
-
 // Requirements
 var mysql = require('mysql');
 var inquirer = require('inquirer');
@@ -90,8 +75,46 @@ function viewLowInv() {
 }
 
 function addInventory() {
-
-
+    connection.query('SELECT * FROM products', function (err, res) {
+        if (err) throw err;
+        // console.log(res);
+        inquirer.prompt([
+            {
+                name: 'chosenItem',
+                type: 'list',
+                choices: function () {
+                    var productList = [];
+                    for (var i = 0; i < res.length; i++) {
+                        productList.push(res[i].product_name);
+                    }
+                    return productList;
+                }
+            }, {
+                name: 'addAmount',
+                type: 'input',
+                message: 'How many are you adding to inventory?'
+            }
+        ]).then(function (answer) {
+            var chosenItem;
+            var currentStock;
+            for (var i = 0; i < res.length; i++) {
+                if (answer.chosenItem === res[i].product_name) {
+                    chosenItem = res[i];
+                    currentStock = parseInt(res[i].stock_quantity);
+                }
+            }
+            // console.log('chosenItem:', chosenItem);
+            
+            connection.query('UPDATE products SET ? WHERE ?', [{stock_quantity: parseInt(currentStock) + parseInt(answer.addAmount)}, {product_name: chosenItem.product_name}], function(err, result) {
+                if (err) throw err;
+                console.log('--------------------------------------------------------');
+                console.log(`Added ${answer.addAmount} units of ${answer.chosenItem}`);
+                console.log(`${answer.chosenItem} Inventory: ${parseInt(currentStock) + parseInt(answer.addAmount)}`);
+                console.log('--------------------------------------------------------');
+                manage();
+            });
+        });
+    });
 }
 
 function addProduct() {
@@ -127,6 +150,8 @@ function addProduct() {
                 viewProduct();
                 manage();
             });
-        });
-        
+    });
+
 }
+
+// [{ stock_quantity: currentStock + parseInt(answer.addQuantity) }, 
