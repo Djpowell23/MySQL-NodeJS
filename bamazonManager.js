@@ -43,8 +43,6 @@ function manage() {
                 console.log('Have a nice day, sir!');
                 connection.end();
                 break;
-
-
         }
     });
 }
